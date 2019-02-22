@@ -1,0 +1,71 @@
+{
+  "name": "typeorm",
+  "displayName": "TypeORM",
+  "description": "TypeORM database explorer",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.30.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onView:extension.typeormExplorer",
+    "onCommand:extension.connectDB",
+    "onCommand:extension.readConfig"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "views": {
+      "typeormView": [
+        {
+          "id": "extension.typeormExplorer",
+          "name": "TypeORM models"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "typeormView",
+          "title": "TypeORM Explorer",
+          "icon": "media/logo.png"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "extension.connectDB",
+        "title": "TypeORM: Open Database"
+      },
+      {
+        "command": "extension.readConfig",
+        "title": "TypeORM: Read configuration"
+      },
+      {
+        "command": "extension.execSQL",
+        "title": "TypeORM: Execute selected SQL"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "yarn run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "yarn run compile && node ./node_modules/vscode/bin/test"
+  },
+  "devDependencies": {
+    "@types/dotenv": "^6.1.0",
+    "@types/mocha": "^2.2.42",
+    "@types/node": "^8.10.25",
+    "tslint": "^5.8.0",
+    "typescript": "^3.1.4",
+    "vscode": "^1.1.25"
+  },
+  "dependencies": {
+    "dotenv": "^6.2.0",
+    "pg": "^7.7.1",
+    "typeorm": "^0.2.11"
+  }
+}
