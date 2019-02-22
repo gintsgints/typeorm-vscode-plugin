@@ -20,7 +20,7 @@
       "typeormView": [
         {
           "id": "extension.typeormExplorer",
-          "name": "TypeORM models"
+          "name": "Connections"
         }
       ]
     },
