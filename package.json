@@ -39,10 +39,6 @@
         "title": "TypeORM: Open Database"
       },
       {
-        "command": "extension.readConfig",
-        "title": "TypeORM: Read configuration"
-      },
-      {
         "command": "extension.execSQL",
         "title": "TypeORM: Execute selected SQL"
       }

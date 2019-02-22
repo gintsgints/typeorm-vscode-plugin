@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
-import { getConnection, EntityMetadata, Connection } from 'typeorm';
-import { readConfig } from './readConfig';
+import { getConnectionManager, EntityMetadata } from 'typeorm';
 import { openDatabase } from './openDatabase';
 
 export class TypeORMProvider implements vscode.TreeDataProvider<Model> {
@@ -17,16 +16,14 @@ export class TypeORMProvider implements vscode.TreeDataProvider<Model> {
   }
 
   private async getEntities(): Promise<Model[]> {
-    await readConfig();
-    let connection: Connection | null;
-    try {
-      connection = getConnection('default');
-    } catch (error) {
-      connection = await openDatabase();
+    const manager = getConnectionManager();
+
+    if (manager.connections.length === 0) {
+      await openDatabase();
     }
 
-    if (connection) {
-      const entities = connection.entityMetadatas;
+    if (manager.connections[0]) {
+      const entities = manager.connections[0].entityMetadatas;
       const items = entities.map((entity: EntityMetadata) => {
         return new Model(entity.name);
       });
