@@ -1,0 +1,10 @@
+db:
+  image: postgres:11.1-alpine
+  ports:
+    - '5432:5432'
+  environment:
+    - POSTGRES_PASSWORD=postgres_234
+  log_driver: 'json-file'
+  log_opt:
+    max-size: '50m'
+    max-file: '20'

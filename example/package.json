@@ -1,0 +1,19 @@
+{
+  "name": "demo",
+  "version": "1.0.0",
+  "description": "VS Code TypeORM plugin demo project",
+  "main": "dist/server.js",
+  "author": "Gints Polis <gints.polis@lattelecom.lv>",
+  "license": "MIT",
+  "scripts": {
+    "build": "rimraf ./dist && yarn tsc"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.1",
+    "rimraf": "^2.6.2",
+    "typescript": "^3.2.2"
+  }
+}

@@ -20,6 +20,10 @@
   version "8.10.39"
   resolved "http://repo.telekom.lv/repository/npm-public/@types/node/-/node-8.10.39.tgz#e7e87ad00364dd7bc485c940926345b8ec1a26ca"
 
+"@types/require-from-string@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@types/require-from-string/-/require-from-string-1.2.0.tgz#c18cfc8a2c1a0259e5841d1fef2b5e9d01c64242"
+
 ajv@^6.5.5:
   version "6.6.2"
   resolved "http://repo.telekom.lv/repository/npm-public/ajv/-/ajv-6.6.2.tgz#caceccf474bf3fc3ce3b147443711a24063cc30d"
@@ -1436,6 +1440,10 @@ require-directory@^2.1.1:
   version "2.1.1"
   resolved "http://repo.telekom.lv/repository/npm-public/require-directory/-/require-directory-2.1.1.tgz#8c64ad5fd30dab1c976e2344ffe7f792a6a6df42"
 
+require-from-string@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/require-from-string/-/require-from-string-2.0.2.tgz#89a7fdd938261267318eafe14f9c32e598c36909"
+
 require-main-filename@^1.0.1:
   version "1.0.1"
   resolved "http://repo.telekom.lv/repository/npm-public/require-main-filename/-/require-main-filename-1.0.1.tgz#97f717b69d48784f5f526a6c5aa8ffdda055a4d1"
@@ -1749,9 +1757,9 @@ typeorm@^0.2.11:
     yargonaut "^1.1.2"
     yargs "^12.0.5"
 
-typescript@^3.1.4:
-  version "3.2.2"
-  resolved "http://repo.telekom.lv/repository/npm-public/typescript/-/typescript-3.2.2.tgz#fe8101c46aa123f8353523ebdcf5730c2ae493e5"
+typescript@^3.3.3333:
+  version "3.3.3333"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.3.3333.tgz#171b2c5af66c59e9431199117a3bcadc66fdcfd6"
 
 unc-path-regex@^0.1.2:
   version "0.1.2"
