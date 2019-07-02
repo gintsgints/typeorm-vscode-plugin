@@ -1,18 +1,20 @@
 import * as vscode from 'vscode';
-import { transpileModule, sys } from 'typescript';
+// import { transpileModule, sys } from 'typescript';
 import {
   // getConnectionManager,
   // EntityMetadata,
   // Connection,
   ConnectionOptions,
-  ConnectionOptionsReader
+  ConnectionOptionsReader,
+  Connection,
+  getConnectionManager,
+  EntityMetadata
 } from 'typeorm';
-import {
-  getAllFiles,
-  splitClassesAndStrings,
-  findTypescriptCompileOptions
-} from './utils';
-import { PlatformTools } from 'typeorm/platform/PlatformTools';
+// import {
+//   getAllFiles,
+//   splitClassesAndStrings,
+//   findTypescriptCompileOptions
+// } from './utils';
 // import { openDatabase } from './openDatabase';
 
 interface TypeOrmObject {
@@ -69,7 +71,7 @@ export class TypeORMProvider implements vscode.TreeDataProvider<TypeOrmObject> {
               })
             );
           }
-          return new TypeORMConnectionOptions(option);
+          return new TypeORMConnection(getConnectionManager().create(option));
         });
       } else {
         return Promise.resolve([]);
@@ -80,88 +82,94 @@ export class TypeORMProvider implements vscode.TreeDataProvider<TypeOrmObject> {
   }
 }
 
-class TypeORMConnectionOptions implements TypeOrmObject {
+class TypeORMConnection implements TypeOrmObject {
   id: string;
-  metadata: ConnectionOptions;
+  metadata: Connection;
 
-  constructor(connectionOptions: ConnectionOptions) {
-    this.metadata = connectionOptions;
-    if (connectionOptions.name) {
-      this.id = connectionOptions.name;
+  constructor(connection: Connection) {
+    this.metadata = connection;
+    if (connection.name) {
+      this.id = connection.name;
     } else {
       this.id = 'default';
     }
   }
 
-  getChildren(): TypeOrmObject[] {
-    const [entityClassesOrSchemas, entityDirectories] = splitClassesAndStrings(
-      this.metadata.entities || []
-    );
-    const files = getAllFiles(entityDirectories);
-    return files.map(file => {
-      return new TypeOrmEntityFile(files.indexOf(file).toString(), file);
-    });
-  }
-
-  getTreeItem(): vscode.TreeItem {
-    const treeItem = new vscode.TreeItem(
-      `${this.id} (${this.metadata.database})`
-    );
-    treeItem.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
-    return treeItem;
-  }
-}
-
-class DummyObject implements TypeOrmObject {
-  constructor(readonly id: string, readonly diagnostic?: string) {}
-
-  getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
-    const treeItem = new vscode.TreeItem(
-      this.id,
-      vscode.TreeItemCollapsibleState.None
-    );
-    if (this.diagnostic) {
-      treeItem.tooltip = this.diagnostic;
-    }
-    return treeItem;
-  }
-
-  getChildren(): vscode.ProviderResult<TypeOrmObject[]> {
-    return [];
-  }
-}
-
-class TypeOrmEntityFile implements TypeOrmObject {
-  id: string;
-  metadata: any = undefined;
-  fullpath: string;
-
-  constructor(name: string, fullpath: string) {
-    this.id = name;
-    this.fullpath = fullpath;
-  }
-
   async getChildren(): Promise<TypeOrmObject[]> {
-    try {
-      const entityts = sys.readFile(PlatformTools.pathResolve(this.fullpath));
-      const options = await findTypescriptCompileOptions();
-      if (entityts) {
-        const entityjs = transpileModule(entityts, options.compilerOptions);
-        const requireFromString = require('require-from-string');
-        this.metadata = requireFromString(entityjs.outputText);
+    await this.metadata.connect();
+    // const [entityClassesOrSchemas, entityDirectories] = splitClassesAndStrings(
+    //   this.metadata.entities || []
+    // );
+    // const files = getAllFiles(entityDirectories);
+    // return files.map(file => {
+    //   return new TypeOrmEntityFile(this.metadata.entities[index]., file);
+    // });
+    return this.metadata.entityMetadatas.map(
+      (entityMetadata: EntityMetadata) => {
+        return new TypeOrmEntity(entityMetadata);
       }
-      return Promise.resolve([new DummyObject('cool')]);
-    } catch (error) {
-      return Promise.resolve([new DummyObject(error)]);
-    }
+    );
   }
 
   getTreeItem(): vscode.TreeItem {
-    const treeItem = new vscode.TreeItem(this.id);
+    const treeItem = new vscode.TreeItem(
+      `${this.id} (${this.metadata.options.database})`
+    );
     treeItem.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
     return treeItem;
   }
 }
+
+// class DummyObject implements TypeOrmObject {
+//   constructor(readonly id: string, readonly diagnostic?: string) {}
+
+//   getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
+//     const treeItem = new vscode.TreeItem(
+//       this.id,
+//       vscode.TreeItemCollapsibleState.None
+//     );
+//     if (this.diagnostic) {
+//       treeItem.tooltip = this.diagnostic;
+//     }
+//     return treeItem;
+//   }
+
+//   getChildren(): vscode.ProviderResult<TypeOrmObject[]> {
+//     return [];
+//   }
+// }
+
+// class TypeOrmEntityFile implements TypeOrmObject {
+//   id: string;
+//   metadata: any = undefined;
+//   fullpath: string;
+
+//   constructor(name: string, fullpath: string) {
+//     this.id = name;
+//     this.fullpath = fullpath;
+//   }
+
+//   async getChildren(): Promise<TypeOrmObject[]> {
+//     try {
+//       const entityts = sys.readFile(PlatformTools.pathResolve(this.fullpath));
+//       const options = await findTypescriptCompileOptions();
+//       if (entityts) {
+//         const entityjs = transpileModule(entityts, options.compilerOptions);
+//         const requireFromString = require('require-from-string');
+//         this.metadata = requireFromString(entityjs.outputText);
+//       }
+//       return Promise.resolve([new DummyObject('cool')]);
+//     } catch (error) {
+//       return Promise.resolve([new DummyObject(error)]);
+//     }
+//   }
+
+//   getTreeItem(): vscode.TreeItem {
+//     const treeItem = new vscode.TreeItem(this.id);
+//     treeItem.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
+//     return treeItem;
+//   }
+// }
 
 // class TypeOrmConnection implements TypeOrmObject {
 //   id: string;
@@ -188,21 +196,21 @@ class TypeOrmEntityFile implements TypeOrmObject {
 //   }
 // }
 
-// class TypeOrmEntity implements TypeOrmObject {
-//   id: string;
-//   metadata: EntityMetadata;
+class TypeOrmEntity implements TypeOrmObject {
+  id: string;
+  metadata: EntityMetadata;
 
-//   constructor(entity: EntityMetadata) {
-//     this.metadata = entity;
-//     this.id = entity.name;
-//   }
+  constructor(entity: EntityMetadata) {
+    this.metadata = entity;
+    this.id = entity.name;
+  }
 
-//   getChildren(): TypeOrmObject[] {
-//     return [];
-//   }
+  getChildren(): TypeOrmObject[] {
+    return [];
+  }
 
-//   getTreeItem(): vscode.TreeItem {
-//     const treeItem = new vscode.TreeItem(this.id);
-//     return treeItem;
-//   }
-// }
+  getTreeItem(): vscode.TreeItem {
+    const treeItem = new vscode.TreeItem(this.id);
+    return treeItem;
+  }
+}
